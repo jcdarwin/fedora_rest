@@ -19,6 +19,7 @@ class FedoraClient {
     protected $usernm=NULL;
     protected $userpw=NULL;
     protected $version=NULL;
+    protected $auth=NULL;
 
     // Handle REST API version differences
     public $API_EXPERIMENTAL = array('3.0' => 1, '3.1' => 1);
@@ -33,16 +34,19 @@ class FedoraClient {
      * Class constructor :: set up parameters to connect to repository
      *
      */
-    public function __construct($svr = 'http://localhost:8080/fedora',
-                                $nm = 'fedoraAdmin', $pw = 'fedoraAdmin',
-                                $version = '3.3')
+    public function __construct($svr = 'http://localhost:8080/fedora', $version = '3.4')
     {
+				$config = $this->_getSettingsFile();
+				require_once($config);
+$fedora_user = 'fedoraAdmin';
+$fedora_password = 'welcome';
+
         // initialize class variables
         $this->server = $svr;
-        $this->usernm = $nm;
-        $this->userpw = $pw;
+        $this->usernm = $fedora_user;
+        $this->userpw = $fedora_password;
         $this->version = $version;
-
+				$this->auth = ($fedora_user && $fedora_password);
     }
 
 
@@ -107,7 +111,7 @@ class FedoraClient {
         }
 
         try {
-            $result = $this->getRestXML($query);
+            $result = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             // re-throw it to the invoker
@@ -156,7 +160,7 @@ class FedoraClient {
                 restore_error_handler();
                 return $data;
             }
-            $sxe = $this->getRestXML($query);
+            $sxe = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -186,7 +190,7 @@ class FedoraClient {
                 restore_error_handler();
                 return $data;
             }
-            $sxe = $this->getRestXML($query);
+            $sxe = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -210,7 +214,7 @@ class FedoraClient {
         $query = $this->server . $this->API_REST . "/$pid/$service";
 
         try {
-            $sxe = $this->getRestXML($query);
+            $sxe = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -234,7 +238,7 @@ class FedoraClient {
         $query = $this->server . $this->API_REST . "/$pid/versions?format=xml";
 
         try {
-            $fedoraObjectHistory = $this->getRestXML($query);
+            $fedoraObjectHistory = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -263,7 +267,7 @@ class FedoraClient {
         $query = $this->server . $this->API_REST . "/$pid?format=xml";
 
         try {
-            $sxe = $this->getRestXML($query);
+            $sxe = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -290,7 +294,7 @@ class FedoraClient {
         }
 
         try {
-            $objectDatastreams = $this->getRestXML($query);
+            $objectDatastreams = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -324,7 +328,7 @@ class FedoraClient {
         }
 
         try {
-            $objectMethods = $this->getRestXML($query);
+            $objectMethods = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -398,7 +402,7 @@ class FedoraClient {
 
         try {
             //$resp = $this->postRestXML($url, $fields, TRUE);
-            $resp = $this->postRestFile($url, $fields, TRUE);
+            $resp = $this->postRestFile($url, $fields, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -421,7 +425,7 @@ class FedoraClient {
         $query = $this->server . $this->API_REST . "/$pid/objectXML";
 
         try {
-            $sxe = $this->getRestXML($query, TRUE);
+            $sxe = $this->getRestXML($query, $this->auth);
             //$sxe = $this->getRestBinary($query, TRUE);
         } catch (Exception $e) {
             restore_error_handler();
@@ -451,7 +455,7 @@ class FedoraClient {
         }
 
         try {
-            $sxe = $this->postRestXML($query, NULL, TRUE);
+            $sxe = $this->postRestXML($query, NULL, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -554,7 +558,7 @@ class FedoraClient {
         $url .= '?'.$fields;
 
         try {
-            $resp = $this->postRestXML($url, $object, TRUE);
+            $resp = $this->postRestXML($url, $object, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -593,12 +597,12 @@ class FedoraClient {
             if (isset($curlWorkaround) ||
                 isset($this->API_EXPERIMENTAL[$this->version]))
             {
-                $resp = $this->postRestFileWorkaround($url, $modifiedFile, TRUE,
+                $resp = $this->postRestFileWorkaround($url, $modifiedFile, $this->auth,
                                                     $mimeType, $curlWorkaround);
             } else {
                 $fields = array();
                 $fields[basename($modifiedFile)]="@$modifiedFile";
-                $resp = $this->postRestFile($url, $fields, TRUE);
+                $resp = $this->postRestFile($url, $fields, $this->auth);
             }
         } catch (Exception $e) {
             restore_error_handler();
@@ -782,7 +786,7 @@ class FedoraClient {
         }
 
         try {
-            $result = $this->postRestXML($url, $fields);
+            $result = $this->postRestXML($url, $fields, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             // re-throw it to the invoker
@@ -820,7 +824,7 @@ class FedoraClient {
         }
 
         try {
-            $sparql = $this->postRestXML($url, $fields);
+            $sparql = $this->postRestXML($url, $fields, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             // re-throw it to the invoker
@@ -1170,5 +1174,19 @@ class FedoraClient {
         throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
+		/**
+		 *
+		 * Return the name of the site-specific settings file.
+		 */ 
+		protected function _getSettingsFile() {
+		// get current location
+			$module_directory = dirname(__FILE__);
+		
+		// Collect site-specific variables
+			$config = "$module_directory/settings.php";
+			
+			if (! file_exists($config)) die("Required config file not found: $config\n");
+			return $config;
+		}
 }
 

@@ -1,210 +1,215 @@
 <?php
+/**
+ * @file
+ * Install, update and uninstall functions for the fedora_rest module.
+ *
+ */
+
 // $Id$
 
 /**
- * Implementation of hook_install()
- */
-function fedora_rest_install() {
-    drupal_install_schema('fedora_rest');
-}
-
-
-/**
- * Implementation of hook_schema()
+ * Implements hook_schema().
  */
 function fedora_rest_schema() {
 
-    $schema['fedora_rest_node'] = array(
-        'fields' => array(  'nid' => array(
-                                    'type'=>'int',
-                                    'unsigned'=>TRUE,
-                                    'not null'=>TRUE,
-                                    'default'=>0,
-                            ),
-                            'persistent_id' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>'default:notIdentified',
-                            ),
-                            'import_model' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>'',
-                            ),
-                            'collection_id' => array(
-                                    'type'=>'int',
-                                    'unsigned'=>TRUE,
-                                    'not null'=>TRUE,
-                                    'default'=>0,
-                            ),
-        ),
-        'primary key' => array('nid'),
-    );
+  $schema['fedora_rest_node'] = array(
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'persistent_id' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => 'default:notIdentified',
+      ),
+      'import_model' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'collection_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('nid'),
+  );
 
-    $schema['fedora_rest_part'] = array(
-        'fields' => array(
-                        'id' => array(
-                                    'type'=>'serial',
-                                    'not null'=>TRUE,
-                                ),
-                        'nid' => array(
-                                    'type'=>'int',
-                                    'unsigned'=>TRUE,
-                                    'not null'=>TRUE,
-                                    'default'=>0
-                                ),
-                        'part_id' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                        'parent_id' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                        'description' => array(
-                                    'type'=>'text',
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                    ),
-        'primary key' => array('id'),
-        'indexes' => array(
-                        'part_id' => array('nid','part_id'),
-                    ),
-    );
+  $schema['fedora_rest_part'] = array(
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'part_id' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'parent_id' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'description' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'part_id' => array('nid', 'part_id'),
+    ),
+  );
 
-    $schema['fedora_rest_datastream'] = array(
-        'fields' => array(
-                        'id' => array(
-                                    'type'=>'serial',
-                                    'not null'=>TRUE,
-                                ),
-                        'nid' => array(
-                                    'type'=>'int',
-                                    'unsigned'=>TRUE,
-                                    'not null'=>TRUE,
-                                    'default'=>0
-                                ),
-                        'part_id' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                        'ds_id' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                        'rest_url' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                    ),
-        'primary key' => array('id'),
-        'indexes' => array(
-                        'ds_id' => array('nid','ds_id'),
-                        'part_id' => array('nid','part_id'),
-                    ),
-    );
+  $schema['fedora_rest_datastream'] = array(
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'part_id' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'ds_id' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'rest_url' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('id'),
+    'indexes' => array(
+      'ds_id' => array('nid', 'ds_id'),
+      'part_id' => array('nid', 'part_id'),
+    ),
+  );
 
-    $schema['fedora_rest_collection'] = array(
-        'fields' => array(
-                        'id' => array(
-                                    'type'=>'serial',
-                                    'not null'=>TRUE,
-                                ),
-                        'uri' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                        'name' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                        'description' => array(
-                                    'type'=>'text',
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                        'server' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>''
-                                ),
-                        'version' => array(
-                                    'type'=>'varchar',
-                                    'length'=>255,
-                                    'not null'=>TRUE,
-                                    'default'=>'3.3'
-                                ),
-                    ),
-        'primary key' => array('id'),
-    );
+  $schema['fedora_rest_collection'] = array(
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'uri' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'description' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+      ),
+      'server' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'version' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '3.4',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
 
-    return $schema;
+  return $schema;
 }
 
 
 /**
- * Implementation of hook_uninstall()
+ * Implements hook_uninstall().
  */
 function fedora_rest_uninstall() {
 
-    // delete any nodes of this node type
-    $result = db_query( "SELECT nid FROM {node} WHERE type = '%s'",
-                        FEDORA_REST_NODE );
-    while ($row = db_fetch_object($result)) {
-        node_delete($row->nid);
-    }
+  // delete any nodes of this node type
+  $result = db_query("SELECT nid FROM {node} WHERE type = :type", array(':type' => FEDORA_REST_NODE));
+  foreach ($result as $row) {
+    node_delete($row->nid);
+  }
 
-    drupal_uninstall_schema('fedora_rest');
-
-    // delete all module variables in one fell swoop (should flush cache, too)
-    db_query("DELETE FROM {variable} WHERE name like 'fedora_rest_%'");
+  // delete all module variables in one fell swoop (should flush cache, too)
+  db_delete('variable')
+  ->condition('name', 'fedora_rest_%', 'like')
+  ->execute();
 }
 
 /**
  * Beta release introduced some data changes from development versions:
  *
  * 1. use drupal filter form, save input format id rather than name
- * 
+ *
  * 2. added a version field to the collection record to handle
  *    REST API changes that were introduced with Fedora 3.2
  */
 function fedora_rest_update_1() {
 
-    $fmt_name = variable_get('fedora_rest_format_arg', '');
-    if ($fmt_name) {
-        $frow = db_fetch_object(db_query("SELECT format FROM {filter_formats} WHERE name='%s'",$fmt_name));
-        if (is_object($frow)) {
-            $format = $frow->format;
-        } else {
-            $format = 0;
-        }
-        variable_del('fedora_rest_format_arg');
-    } else {
-        $format = 0;
+  $fmt_name = variable_get('fedora_rest_format_arg', '');
+  if ($fmt_name) {
+    $frow = db_query("SELECT format FROM {filter_formats} WHERE name = :name", array(':name' => $fmt_name))>fetch();
+    if (is_object($frow)) {
+      $format = $frow->format;
     }
-    variable_set('fedora_rest_format', $format);
+    else {
+      $format = 0;
+    }
+    variable_del('fedora_rest_format_arg');
+  }
+  else {
+    $format = 0;
+  }
+  variable_set('fedora_rest_format', $format);
 
-    $ret = array();
-    db_add_field( $ret, 'fedora_rest_collection', 'version',
-                 array('type'=>'varchar', 'length'=>255,
-                        'not null'=>TRUE, 'default'=>'3.3') );
-    return $ret;
+  $ret = array();
+  db_add_field('fedora_rest_collection', 'version',
+                 array(
+    'type' => 'varchar',
+    'length' => 255,
+    'not null' => TRUE,
+    'default' => '3.4',
+  ) );
+  // hook_update_N() no longer returns a $ret array. Instead, return
+  // nothing or a translated string indicating the update ran successfully.
+  // See http://drupal.org/node/224333#update_sql.
+  return t('TODO Add a descriptive string here to show in the UI.') /* $ret */;
 }

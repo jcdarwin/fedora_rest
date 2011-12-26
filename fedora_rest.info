@@ -1,8 +1,7 @@
 ; $Id$
 name = "Fedora REST API"
 description = "Programming interface to invoke Fedora Commons REST methods"
-package = "Fedora Commons Repository"
-core = "6.x"
-php = 5.0.0
-version = "6.x-1.0-beta2"
-
+package = Fedora Commons Repository
+core = 7.x
+php = 5.1
+version = "7.x-1.0-beta1"

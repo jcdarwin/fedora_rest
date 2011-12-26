@@ -5,9 +5,10 @@
 ********************************************************************
 
 Name: Fedora REST API
-Author: Don Gourley
+Author: Jason Darwin (Forked from Don Gourley's Drupal 6 module of
+the same name.
 Maintainers: 
-Drupal: 6
+Drupal: 7
 
 
 ********************************************************************
@@ -26,16 +27,20 @@ add Fedora object attributes to the node.
 INSTALLATION:
 
 1. Place the entire fedora_rest directory into your Drupal
-   sites/all/modules directory.
+   sites/all *or* default/modules directory.
+   
+2. Configure any authentication settings needed for conection to 
+   your Fedora repository in:
+   sites/all *or* default/modules/fedora_rest/settings.php
 
-2. Enable the workflow module by navigating to:
+3. Enable the module by navigating to:
 
      Administer > Site building > Modules > Fedora Commons Repository
 
    Enabling the Fedora REST API module will create the necessary
    database tables for you.
 
-3. Configure the import parameters at:
+4. Configure the import parameters at:
 
      Administer > Site configuration > Fedora API settings
 
@@ -45,7 +50,7 @@ REPOSITRY REQUIREMENTS:
 
 This module only works with the RESTful Web Service oriented API that
 was introduced in Fedora 3, so Fedora Commons 3.0 or greater is
-required.
+required (3.4 is considered the default version).
 
 The Fedora REST API module uses the Fedora Commons repository Resource
 Index to select objects for importing, so the Resource Index must be

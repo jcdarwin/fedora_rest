@@ -37,10 +37,12 @@ if ($args->isOptionSet('h', 'help')) show_help();
 
 // Collect & check site specific variables
 if (! ($config = $args->getOptionValue('s', 'settings')) ) {
-    $config = "$module_directory/cli_settings.php";
+    $config = "$module_directory/settings.php";
 }
 if (! file_exists($config)) die("Required config file not found: $config\n");
 require_once($config);
+if (! isset($fedora_user)) die("Required setting not defined: fedora_user\n");
+if (! isset($fedora_password)) die("Required setting not defined: fedora_password\n");
 if (! $site_directory) die("Required setting not defined: site_directory\n");
 if (! $site_url) die("Required setting not defined: site_url\n");
 
@@ -80,7 +82,7 @@ if ($user === FALSE) die("Unable to load user $username\n");
 // get settings from fedora_rest variables
 $server = variable_get( 'fedora_rest_server_arg',
                             'http://localhost:8080/fedora' );
-$version = variable_get( 'fedora_rest_version_arg', '3.3' );
+$version = variable_get( 'fedora_rest_version_arg', '3.4' );
 $collection = variable_get( 'fedora_rest_collection_arg',
                             'drupal:ImportCollection' );
 $predicate = variable_get( 'fedora_rest_predicate_arg',
@@ -90,7 +92,7 @@ $object = variable_get( 'fedora_rest_object_arg',
 $ntype = variable_get('fedora_rest_nt_arg', 'fedora_object' );
 $format = variable_get('fedora_rest_format', 0);
 $nuser = variable_get('fedora_rest_owner_arg', 'admin' );
-$urow = db_fetch_object(db_query("SELECT uid FROM {users} WHERE name='%s'",$nuser));
+$urow = db_query("SELECT uid FROM {users} WHERE name='%s'",$nuser)>fetch();
 if (is_object($urow)) {
     $nuid = $urow->uid;
 } else {
@@ -103,6 +105,7 @@ echo "\n";
 echo "Import Parameters:\n";
 echo "    Collection URI:   $collection\n";
 echo "    Repository URL:   $server\n";
+echo "    Repository User:  $fedora_user\n";
 echo "    Repository API:   $version\n";
 echo "    SPO Predicate:    $predicate\n";
 echo "    SPO Object:       $object\n";
@@ -115,7 +118,7 @@ echo "\n";
 
 $rtn = fedora_rest_import_items($server,$collection,$predicate,$object,$ntype,
                                 $nuid, $args->isOptionSet('d', 'delete'),
-                                $resLimit, $format, $version);
+                                $resLimit, $format, $version, $fedora_user, $fedora_password);
 
 foreach ($fedora_rest_import_messages as $message) {
     print $message;
