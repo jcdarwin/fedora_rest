@@ -216,7 +216,9 @@ function fedora_rest_validate($node) {
     // verify that such an object exists in the collection
     $coll = db_query("SELECT * FROM {fedora_rest_collection} WHERE id = :cid", array(':cid' => $cid))->fetchObject();
     if (is_object($coll)) {
-        $client = new FedoraClient( $coll->server, $coll->version );
+				// load the default settings for authentication
+				require('settings.php');
+        $client = new FedoraClient( $coll->server, $fedora_user, $fedora_password, $coll->version );
         $q = "pid=$pid";
         $request = array( 'query' => $q );
         try{
@@ -454,7 +456,9 @@ function fedora_rest_nodeapi(&$node, $op, $parent_type=NULL, $arg4=NULL) {
             // get the server URL for this collection
             $coll = db_query("SELECT * FROM {fedora_rest_collection} WHERE id = :cid", array(':cid' => $cid))->fetchObject();
             if (is_object($coll)) {
-                $client = new FedoraClient( $coll->server, $coll->version );
+								// load the default settings for authentication
+								require('settings.php');
+                $client = new FedoraClient( $coll->server, $fedora_user, $fedora_password, $coll->version );
                 $q = "pid=$pid";
                 $request = array( title => 'true',
                                 description => 'true',
@@ -766,7 +770,9 @@ function fedora_rest_make_parts($node, $part_id, $parent_id = NULL,
 
   // create a client object if needed
   if (is_null($client)) {
-    $client = new FedoraClient( $server, $version );
+		// load the default settings for authentication
+		require('settings.php');
+    $client = new FedoraClient( $server, $fedora_user, $fedora_password, $version );
   }
 
   // get description

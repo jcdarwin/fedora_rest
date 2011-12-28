@@ -13,7 +13,7 @@ class FedoraClient {
     // but can be overridden by set methods
     protected $API_REST = '/objects';
     protected $RISEARCH_REST = '/risearch';
-
+		
     // Fedora server connection parameters (set in constructor)
     protected $server=NULL;
     protected $usernm=NULL;
@@ -34,19 +34,14 @@ class FedoraClient {
      * Class constructor :: set up parameters to connect to repository
      *
      */
-    public function __construct($svr = 'http://localhost:8080/fedora', $version = '3.4')
+    public function __construct($svr = 'http://localhost:8080/fedora', $usr=NULL, $pwd=NULL, $version = '3.4')
     {
-				$config = $this->_getSettingsFile();
-				require_once($config);
-$fedora_user = 'fedoraAdmin';
-$fedora_password = 'welcome';
-
         // initialize class variables
         $this->server = $svr;
-        $this->usernm = $fedora_user;
-        $this->userpw = $fedora_password;
+        $this->usernm = $usr;
+        $this->userpw = $pwd;
         $this->version = $version;
-				$this->auth = ($fedora_user && $fedora_password);
+				$this->auth = ($usr && $pwd);
     }
 
 
@@ -1174,19 +1169,5 @@ $fedora_password = 'welcome';
         throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
     }
 
-		/**
-		 *
-		 * Return the name of the site-specific settings file.
-		 */ 
-		protected function _getSettingsFile() {
-		// get current location
-			$module_directory = dirname(__FILE__);
-		
-		// Collect site-specific variables
-			$config = "$module_directory/settings.php";
-			
-			if (! file_exists($config)) die("Required config file not found: $config\n");
-			return $config;
-		}
 }
 

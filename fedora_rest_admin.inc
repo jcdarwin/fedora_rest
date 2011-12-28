@@ -14,7 +14,7 @@
  * @see system_settings_form().
  */
 function fedora_rest_admin_config($form, &$form_state) {
-	
+
   // create arrays for selecting options
   $users = array();
   $result = db_query("SELECT name FROM {users} WHERE status > :status ORDER BY name", array(':status' => 0));
@@ -81,7 +81,7 @@ function fedora_rest_admin_config($form, &$form_state) {
     '#title' => t('REST API version'),
     '#default_value' => variable_get('fedora_rest_version_arg', '3.4'),
     '#description' => t('Select the Fedora repository version; this handles differences in the REST API that were introduced with version 3.2'),
-    '#weight' => -8,
+    '#weight' => -6,
   );
   $form['fedora_rest_import']['fedora_rest_batch']['fedora_rest_predicate_arg'] = array(
     '#type' => 'textfield',
@@ -91,7 +91,7 @@ function fedora_rest_admin_config($form, &$form_state) {
                                          FEDORA_REST_DEMO_PREDICATE),
     '#maxlength' => 255,
     '#description' => t('Enter the URI of the Predicate used in the Resource Index to relate digital objects you want to import to the Object that you enter in the next field; these fields will be used to create an SPO query of the form "* &lt;Predicate&gt; &lt;Object&gt;" to select digital objects.'),
-    '#weight' => -7,
+    '#weight' => -5,
   );
   $form['fedora_rest_import']['fedora_rest_batch']['fedora_rest_object_arg'] = array(
     '#type' => 'textfield',
@@ -101,7 +101,7 @@ function fedora_rest_admin_config($form, &$form_state) {
                                          FEDORA_REST_DEMO_COLLECTION),
     '#maxlength' => 255,
     '#description' => t('Enter the URI of, or String representing, the Object used in the Resource Index that digital objects you want to import are related to by the Predicate that you enter in the previous field; these fields will be used to create an SPO query of the form "* &lt;Predicate&gt; &lt;Object&gt;" to select digital objects.'),
-    '#weight' => -6,
+    '#weight' => -4,
   );
   $form['fedora_rest_import']['fedora_rest_batch']['fedora_rest_nt_arg'] = array(
     '#type' => 'select',
@@ -110,7 +110,7 @@ function fedora_rest_admin_config($form, &$form_state) {
     '#multiple' => FALSE,
     '#default_value' => variable_get('fedora_rest_nt_arg', 'fedora_object'),
     '#description' => t('Enter the Drupal node type that imported objects will be assigned to.'),
-    '#weight' => -5,
+    '#weight' => -3,
   );
   $form['fedora_rest_import']['fedora_rest_batch']['fedora_rest_owner_arg'] = array(
     '#type' => 'select',
@@ -118,7 +118,7 @@ function fedora_rest_admin_config($form, &$form_state) {
     '#options' => $users,
     '#default_value' => variable_get('fedora_rest_owner_arg', 'admin'),
     '#description' => t('Select the user to mark as the author for each NEW node that is created (does not affect previously created nodes).'),
-    '#weight' => -4,
+    '#weight' => -2,
   );
   if (module_exists('taxonomy') and ! empty($vocabs)) {
     $form['fedora_rest_import']['fedora_rest_batch']['fedora_rest_clear_vocab'] = array(
@@ -129,7 +129,7 @@ function fedora_rest_admin_config($form, &$form_state) {
       //'#size' => 10,
       '#default_value' => array(),
       '#description' => t('Select vocabularies to clear before importing. WARNING: Only clear vocabularies that will be rebuilt by the import!'),
-      '#weight' => 0,
+      '#weight' => -1,
     );
   }
   $form['fedora_rest_import']['fedora_rest_batch']['fedora_rest_delete_arg'] = array(
@@ -258,6 +258,13 @@ function fedora_rest_admin_config_submit($form, &$form_state) {
     // these options are passed to the import_items method
     $collection = $form_state['values']['fedora_rest_collection_arg'];
     $server = $form_state['values']['fedora_rest_server_arg'];
+
+		// load the default settings for authentication
+		$fedora_rest_settings = "settings.php";
+		require($fedora_rest_settings);
+    $usr = $fedora_user;
+    $password = $fedora_password;
+
     $version = $form_state['values']['fedora_rest_version_arg'];
     $predicate = $form_state['values']['fedora_rest_predicate_arg'];
     $object = $form_state['values']['fedora_rest_object_arg'];
@@ -277,7 +284,7 @@ function fedora_rest_admin_config_submit($form, &$form_state) {
       $limit = 0;
     }
 
-    $rtn = fedora_rest_import_items($server, $collection, $predicate, $object,
+    $rtn = fedora_rest_import_items($server, $usr, $password, $collection, $predicate, $object,
                                 $ntype, $nuid, $delete, $limit, $format, $version);
     if ($rtn === FALSE) {
       drupal_set_message(t('Import aborted!'), 'error');
@@ -288,18 +295,18 @@ function fedora_rest_admin_config_submit($form, &$form_state) {
 }
 
 
-function fedora_rest_import_items(  $server, $collection, $spo_predicate,
+function fedora_rest_import_items(  $server, $usr, $password, $collection, $spo_predicate,
                                     $spo_object, $node_type, $node_UID=1,
                                     $delete=FALSE, $res_limit=0, $format=0,
                                     $version='3.4') {
     global $user;
     global $_fedora_rest_import_messages;
 
-    fedora_rest_trace("fedora_rest_import_items($server,$collection,$spo_predicate,$spo_object,$node_type,$node_UID,$delete,$res_limit,$format,$version)");
+    fedora_rest_trace("fedora_rest_import_items($server,$usr,$password,$collection,$spo_predicate,$spo_object,$node_type,$node_UID,$delete,$res_limit,$format,$version)");
 
     $_fedora_rest_import_messages = array();
     try {
-        $client = new FedoraClient( $server, $version );
+        $client = new FedoraClient( $server, $usr, $password, $version );
     } catch (Exception $e) {
         $exception = '<pre>' . print_r($e, TRUE) . '</pre>';
         drupal_set_message(t("Exception Object:: $exception\n"), 'error');
@@ -323,7 +330,7 @@ function fedora_rest_import_items(  $server, $collection, $spo_predicate,
     'description' => '',
   ))
   ->execute();
-    $collection_ID = db_last_insert_id('fedora_rest_collection', 'id');
+    $collection_ID = $id;
   }
 
 
@@ -578,3 +585,18 @@ function fedora_rest_reset_messages( ) {
      }
   }
  }
+
+/**
+ *
+ * Return the name of the site-specific settings file.
+ */ 
+function _getSettingsFile() {
+// get current location
+	$module_directory = dirname(__FILE__);
+
+// Collect site-specific variables
+	$config = "$module_directory/settings.php";
+	
+	if (! file_exists($config)) die("Required config file not found: $config\n");
+	return $config;
+}
