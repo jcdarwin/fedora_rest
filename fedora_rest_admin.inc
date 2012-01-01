@@ -294,15 +294,296 @@ function fedora_rest_admin_config_submit($form, &$form_state) {
   }
 }
 
+// * <http://quakestudies.canterbury.ac.nz#hasType> <info:fedora/qsr:content_partner>
+function fedora_rest_retrieve_spo($spo_subject, $spo_predicate, $spo_object ) {
+	fedora_rest_trace("fedora_rest_retrieve_object_pids($spo_subject,$spo_predicate,$spo_object,$res_limit,$format)");
+	global $_fedora_rest_import_messages;
+
+  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
+  $version = variable_get('fedora_rest_version_arg', '3.4');
+
+	// load the default settings for authentication
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+	$usr = $fedora_user;
+	$password = $fedora_password;
+
+	$res_limit = variable_get('fedora_rest_limit_arg', 0);
+
+	try {
+			$client = new FedoraClient( $server, $usr, $password, $version );
+	} catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+	}
+
+  /***********************************************************************
+   * find objects with the specified relationship in the resource index
+   */
+  $spo_subject_tag = ($spo_subject == '*') ? $spo_subject : '<' . $spo_subject . '>';
+  $spo_predicate_tag = ($spo_predicate == '*') ? $spo_predicate : '<' . $spo_predicate . '>';
+  $spo_object_tag = ($spo_object == '*') ? $spo_object : '<' . $spo_object . '>';
+  $spo_query = $spo_subject_tag . ' ' . $spo_predicate_tag . ' ' . $spo_object_tag;
+
+  fedora_rest_trace("SPO Query: $spo_query (view source to see tags)");
+
+  try {
+    $results = $client->findTriples( $spo_query, $res_limit );
+  }
+  catch (Exception $e) {
+    $exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+    drupal_set_message("Exception Object:: $exception\n", 'error');
+    fedora_rest_save_messages();
+    return FALSE;
+  }
+
+  $count = 0;
+  foreach ($results as $URI => $rdf) {
+    $count++;
+  }
+
+  drupal_set_message(t("!cnt Fedora spo results retrieved", array('!cnt' => $count)),
+                         'status' );
+  fedora_rest_save_messages();
+
+	return $results;
+}
+
+/**
+ * Return an array of object dc from the repo.
+ */
+function fedora_rest_retrieve_objects_dc($pids) {
+	fedora_rest_trace("fedora_rest_retrieve_objects_dc($pids)");
+	global $_fedora_rest_import_messages;
+
+  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
+  $version = variable_get('fedora_rest_version_arg', '3.4');
+
+	// load the default settings for authentication
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+	$usr = $fedora_user;
+	$password = $fedora_password;
+
+	try {
+			$client = new FedoraClient( $server, $usr, $password, $version );
+	} catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+	}
+	
+  /***********************************************************************
+   * return an array of the fedora objects
+   */
+  $count = 0;
+  $fos = array();
+  foreach ($pids as $pid) {
+
+		$q = "pid=$pid";
+		$request = array(
+			'title' => 'true',
+			'type' => 'true',
+			'query' => $q,
+		);
+		try {
+			$response = $client->findObjects( $request );	
+		}
+		catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message("Exception Object:: $exception\n", 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+		}
+		$rcount = count($response);
+		if ($rcount != 1) {
+			drupal_set_message("Search for objects with !q returned !r!\n",
+																 array('!q' => $q, '!r' => $rcount),
+															 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+		}
+
+    if ($fo = $response[$pid]) {
+      $fo->pid = $pid;
+      $status_msg = "retrieving Fedora object $pid => ";
+      drupal_set_message($status_msg, 'status');
+      $count++;
+      fedora_rest_save_messages();
+      $fos[] = (object)$fo;
+    }
+    else {
+      drupal_set_message(t("Unexpected response from repository for pid=$pid\n", array(!pid => $pid)), 'error');
+      fedora_rest_save_messages();
+      return FALSE;
+     }
+     
+  }
+
+  drupal_set_message(t("!cnt Fedora objects retrieved", array('!cnt' => $count)),
+                         'status' );
+  fedora_rest_save_messages();
+  
+  return $fos;
+}
+
+/**
+ * Return an array of datastream objects from the repo.
+ */
+function fedora_rest_retrieve_objects_ds($pids, $dsId = NULL) {
+	fedora_rest_trace("fedora_rest_retrieve_objects_ds($pids, $dsId)");
+	global $_fedora_rest_import_messages;
+
+  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
+  $version = variable_get('fedora_rest_version_arg', '3.4');
+
+	// load the default settings for authentication
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+	$usr = $fedora_user;
+	$password = $fedora_password;
+
+	try {
+			$client = new FedoraClient( $server, $usr, $password, $version );
+	} catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+	}
+	
+  /***********************************************************************
+   * return an array of the fedora objects
+   */
+  $count = 0;
+  $fos = array();
+  foreach ($pids as $pid) {
+
+		try {
+			$response = $client->getDatastreamDissemination( $pid, $dsId );
+		}
+		catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message("Exception Object:: $exception\n", 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+		}
+		$rcount = count($response);
+		if ($rcount != 1) {
+			drupal_set_message("Search for objects for datastream !d returned !r!\n",
+																 array('!d' => $dsId, '!r' => $rcount),
+															 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+		}
+	
+		foreach ($response as $fo) {
+      $fo->pid = $pid;
+      $status_msg = "retrieving Fedora object $pid => ";
+      drupal_set_message($status_msg, 'status');
+      $count++;
+      fedora_rest_save_messages();
+      $fos[] = (object)$fo;
+    }
+     
+  }
+
+  drupal_set_message(t("!cnt Fedora objects retrieved", array('!cnt' => $count)),
+                         'status' );
+  fedora_rest_save_messages();
+  
+  return $fos;
+}
+
+function fedora_rest_get_next_pid() {
+	fedora_rest_trace("fedora_rest_get_next_pid()");
+	global $_fedora_rest_import_messages;
+
+  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
+  $version = variable_get('fedora_rest_version_arg', '3.4');
+
+	// load the default settings for authentication
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+	$usr = $fedora_user;
+	$password = $fedora_password;
+
+	try {
+			$client = new FedoraClient( $server, $usr, $password, $version );
+	} catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+	}
+
+	try {
+		$pid = $client->getNextPID();
+	}
+	catch (Exception $e) {
+		$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+		drupal_set_message("Exception Object:: $exception\n", 'error');
+		fedora_rest_save_messages();
+		return FALSE;
+	}
+
+  drupal_set_message(t("Next pid retrieved: !pid", array('!pid' => $pid)),
+                         'status' );
+  fedora_rest_save_messages();
+  
+  return $pid;
+	
+}
+
+function fedora_rest_ingest($pid, $args, $object) {
+	fedora_rest_trace("fedora_rest_ingest()");
+	global $_fedora_rest_import_messages;
+
+  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
+  $version = variable_get('fedora_rest_version_arg', '3.4');
+
+	// load the default settings for authentication
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+	$usr = $fedora_user;
+	$password = $fedora_password;
+
+	try {
+			$client = new FedoraClient( $server, $usr, $password, $version );
+	} catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+	}
+
+	try {
+		$resp = $client->ingest($pid, $args, $object);
+	}
+	catch (Exception $e) {
+		$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+		drupal_set_message("Exception Object:: $exception\n", 'error');
+		fedora_rest_save_messages();
+		return FALSE;
+	}
+
+  drupal_set_message(t("Ingest response: !resp", array('!resp' => $resp)),
+                         'status' );
+  fedora_rest_save_messages();
+  
+  return $resp;	
+}
 
 function fedora_rest_import_items(  $server, $usr, $password, $collection, $spo_predicate,
                                     $spo_object, $node_type, $node_UID=1,
                                     $delete=FALSE, $res_limit=0, $format=0,
                                     $version='3.4') {
+    fedora_rest_trace("fedora_rest_import_items($server,$usr,$password,$collection,$spo_predicate,$spo_object,$node_type,$node_UID,$delete,$res_limit,$format,$version)");
     global $user;
     global $_fedora_rest_import_messages;
-
-    fedora_rest_trace("fedora_rest_import_items($server,$usr,$password,$collection,$spo_predicate,$spo_object,$node_type,$node_UID,$delete,$res_limit,$format,$version)");
 
     $_fedora_rest_import_messages = array();
     try {

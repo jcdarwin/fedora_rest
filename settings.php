@@ -15,6 +15,10 @@
 $fedora_user = 'fedoraAdmin';
 $fedora_password = 'welcome';
 
+$fedora_server = 'http://localhost:8080/fedora';
+$fedora_version = '3.4';
+$fedora_resource_limit = 0;
+
 // Drupal Site specific variables; these are required
 $site_url = 'http://localhost';
 $site_directory= '/var/www/html';

@@ -12,6 +12,13 @@
  */
 function fedora_rest_schema() {
 
+	// Initialise variables.
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+  variable_set('fedora_rest_server_arg', $fedora_server);
+  variable_set('fedora_rest_version_arg', $fedora_version);
+  variable_set('fedora_rest_limit_arg', $fedora_resource_limit);
+
   $schema['fedora_rest_node'] = array(
     'fields' => array(
       'nid' => array(

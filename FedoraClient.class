@@ -36,12 +36,12 @@ class FedoraClient {
      */
     public function __construct($svr = 'http://localhost:8080/fedora', $usr=NULL, $pwd=NULL, $version = '3.4')
     {
-        // initialize class variables
-        $this->server = $svr;
-        $this->usernm = $usr;
-        $this->userpw = $pwd;
-        $this->version = $version;
-				$this->auth = ($usr && $pwd);
+			// initialize class variables
+			$this->server = $svr;
+			$this->usernm = $usr;
+			$this->userpw = $pwd;
+			$this->version = $version;
+			$this->auth = ($usr && $pwd);
     }
 
 
@@ -396,7 +396,7 @@ class FedoraClient {
         }
 
         try {
-            //$resp = $this->postRestXML($url, $fields, TRUE);
+            //$resp = $this->postRestXML($url, $fields, TRUE, $inlineXML);
             $resp = $this->postRestFile($url, $fields, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
@@ -539,8 +539,6 @@ class FedoraClient {
      */
     public function ingest($pid='new', $args=array(), $object=NULL)
     {
-        // ** NOT TESTED **
-
         // make sure that any errors are handled by throwing an exception
         set_error_handler(array(&$this, 'fedoraClientErrorHandler'));
 
@@ -553,7 +551,7 @@ class FedoraClient {
         $url .= '?'.$fields;
 
         try {
-            $resp = $this->postRestXML($url, $object, $this->auth);
+            $resp = $this->postRestXML($url, NULL, $this->auth, $object);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
@@ -882,7 +880,6 @@ class FedoraClient {
         //  with SimpleXMl (but thrown by the DOM library)
         //  i.e. LIBXML_DTDLOAD is required to force DOM to load the DTD,
         //  luckily the DTD does not have to be local.
-        
         $dom = new DOMDocument();
         $dom->loadXML($response, LIBXML_DTDLOAD);
         
@@ -955,7 +952,7 @@ class FedoraClient {
     /**
      * send a POST request to the REST API, expect XML back
      */
-    protected function postRestXML($url, $fields, $auth=FALSE)
+    protected function postRestXML($url, $fields, $auth=FALSE, $object=FALSE)
     {
         $post = curl_init($url);
         curl_setopt($post, CURLOPT_HEADER, 0); 
@@ -968,6 +965,12 @@ class FedoraClient {
             curl_setopt($post,CURLOPT_SSL_VERIFYPEER, FALSE);
             curl_setopt($post,CURLOPT_SSL_VERIFYHOST, FALSE);
         }
+
+				if ($object) {
+					// Object will be a well-formed XML string.
+					curl_setopt($post, CURLOPT_HTTPHEADER, array("Accept: text/xml", "Content-Type: text/xml")); 
+					curl_setopt($post, CURLOPT_POSTFIELDS, $object);
+				}
 
         $response = curl_exec($post);
         $info = curl_getinfo($post);
@@ -987,7 +990,7 @@ class FedoraClient {
                                 ."-->$response<--", $info['http_code']);
         }
 
-        return new SimpleXMLElement($response);
+				return ($object) ? $response: new SimpleXMLElement($response);
     }
 
     /**
