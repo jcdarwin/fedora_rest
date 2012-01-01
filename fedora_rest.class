@@ -1,0 +1,64 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ *
+ * Expose methods from the fedora_rest modules for other modules
+ */
+
+class fedora_rest {
+
+    // Fedora server connection parameters (set in constructor)
+    protected $server=NULL;
+    protected $usernm=NULL;
+    protected $userpw=NULL;
+    protected $version=NULL;
+    protected $auth=NULL;
+
+    /**
+     * Class constructor :: set up parameters to connect to repository
+     *
+     */
+    public function __construct()
+    {
+				// Pull in the required settings and methods from this module for exposure.
+				require_once('settings.php');
+				require_once('fedora_rest_admin.inc');
+				
+        // initialize class variables
+        $this->server = $fedora_server;
+        $this->usernm = $fedora_user;
+        $this->userpw = $fedora_password;
+        $this->version = $fedora_version;
+				$this->auth = ($fedora_user && $fedora_password);
+    }
+    
+    public function retrieveObjectPids($subject, $predicate, $object) {
+    	$results = fedora_rest_retrieve_spo($subject, $predicate, $object);
+
+			/***********************************************************************
+			 * return an array of pids of the fedora objects
+			 */
+			$pids = array();
+			foreach ($results as $pid_URI => $rdf) {
+				$path = preg_split('|/|', $pid_URI);
+				$pids[] = array_pop($path);
+			}
+		
+			return $pids;    	
+    }
+
+		public function retrieveObjectsMeta($pids) {
+			return fedora_rest_retrieve_objects_dc($pids);			
+		}
+
+		public function retrieveObjects($pids, $dsId) {
+			return fedora_rest_retrieve_objects_ds($pids, $dsId);
+		}
+		
+		public function ingest($pid, $args, $object) {
+			return fedora_rest_ingest($pid, $args, $object);
+		}
+}
+
