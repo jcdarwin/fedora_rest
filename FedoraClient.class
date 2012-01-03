@@ -553,11 +553,14 @@ class FedoraClient {
         try {
             $resp = $this->postRestXML($url, NULL, $this->auth, $object);
         } catch (Exception $e) {
+var_dump($e);
+die;
             restore_error_handler();
             throw $e;
         }
 
         restore_error_handler();
+
         return $resp;
     }
 

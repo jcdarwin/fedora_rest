@@ -23,8 +23,8 @@ class fedora_rest {
     public function __construct()
     {
 				// Pull in the required settings and methods from this module for exposure.
-				require_once('settings.php');
-				require_once('fedora_rest_admin.inc');
+				require('settings.php');
+				require('fedora_rest_admin.inc');
 				
         // initialize class variables
         $this->server = $fedora_server;
@@ -53,12 +53,26 @@ class fedora_rest {
 			return fedora_rest_retrieve_objects_dc($pids);			
 		}
 
-		public function retrieveObjects($pids, $dsId) {
-			return fedora_rest_retrieve_objects_ds($pids, $dsId);
+		public function retrieveObjects($pids, $dsID) {
+			return fedora_rest_retrieve_objects_ds($pids, $dsID);
 		}
 		
 		public function ingest($pid, $args, $object) {
 			return fedora_rest_ingest($pid, $args, $object);
+		}
+		
+		public function modify_datastream($pid, $dsID, $args, $modifiedFile, $curlWorkaround) {
+			$tmpfname = tempnam('/tmp', $dsID);
+			$handle = fopen($tmpfname, 'w');
+			fwrite($handle, $modifiedFile);
+			fclose($handle);
+			$resp = fedora_rest_modify_datastream($pid, $dsID, $args, $tmpfname, $curlWorkaround);
+			unlink($tmpfname);
+			return $resp;
+		}
+		
+		public function purgeObject($pid, $args) {
+			return fedora_rest_purge_object($pid, $args);
 		}
 }
 
