@@ -553,8 +553,6 @@ class FedoraClient {
         try {
             $resp = $this->postRestXML($url, NULL, $this->auth, $object);
         } catch (Exception $e) {
-var_dump($e);
-die;
             restore_error_handler();
             throw $e;
         }
@@ -983,6 +981,12 @@ die;
         if ((!isset($info['http_code'])) ||
             $info['http_code'] < 200 || $info['http_code'] > 299)
         {
+var_dump($url);
+var_dump($fields);
+var_dump($response);
+var_dump($info);
+var_dump($object);
+die;
             throw new Exception("Unsuccessful request-->$response<--",
                         ( isset($info['http_code']) )? $info['http_code'] : 0);
         }
