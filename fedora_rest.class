@@ -23,7 +23,7 @@ class fedora_rest {
     public function __construct()
     {
 				// Pull in the required settings and methods from this module for exposure.
-				require_once('settings.php');
+				require('settings.php');
 				require_once('fedora_rest_admin.inc');
 				
         // initialize class variables
