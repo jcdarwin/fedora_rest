@@ -61,6 +61,11 @@ class fedora_rest {
 			return fedora_rest_ingest($pid, $args, $object);
 		}
 		
+		public function add_datastream($pid, $dsID, $args, $managedFileUri, $inlineXML) {
+			$resp = fedora_rest_add_datastream($pid, $dsID, $args, drupal_realpath($managedFileUri), $inlineXML);
+			return $resp;
+		}
+		
 		public function modify_datastream($pid, $dsID, $args, $modifiedFile, $curlWorkaround) {
 			$tmpfname = tempnam('/tmp', $dsID);
 			$handle = fopen($tmpfname, 'w');
@@ -70,9 +75,14 @@ class fedora_rest {
 			unlink($tmpfname);
 			return $resp;
 		}
-		
+
 		public function purgeObject($pid, $args) {
 			return fedora_rest_purge_object($pid, $args);
 		}
+
+		public function form_datastream_url($pid, $dsID) {
+			return $this->server . "/objects/$pid/datastreams/$dsID/content";
+		}
+		
 }
 

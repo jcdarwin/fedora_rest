@@ -322,10 +322,7 @@ function fedora_rest_retrieve_spo($spo_subject, $spo_predicate, $spo_object ) {
   /***********************************************************************
    * find objects with the specified relationship in the resource index
    */
-  $spo_subject_tag = ($spo_subject == '*') ? $spo_subject : '<' . $spo_subject . '>';
-  $spo_predicate_tag = ($spo_predicate == '*') ? $spo_predicate : '<' . $spo_predicate . '>';
-  $spo_object_tag = ($spo_object == '*') ? $spo_object : '<' . $spo_object . '>';
-  $spo_query = $spo_subject_tag . ' ' . $spo_predicate_tag . ' ' . $spo_object_tag;
+  $spo_query = $spo_subject . ' ' . $spo_predicate . ' ' . $spo_object;
 
   fedora_rest_trace("SPO Query: $spo_query (view source to see tags)");
 
@@ -571,6 +568,45 @@ function fedora_rest_ingest($pid, $args, $object) {
 	}
 
   drupal_set_message(t("Ingest response: !resp", array('!resp' => $resp)),
+                         'status' );
+  fedora_rest_save_messages();
+  
+  return $resp;	
+}
+
+function fedora_rest_add_datastream($pid, $dsID, $args, $managedFile, $inlineXML) {
+	fedora_rest_trace("fedora_rest_add_datastream()");
+	global $_fedora_rest_import_messages;
+
+  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
+  $version = variable_get('fedora_rest_version_arg', '3.4');
+
+	// load the default settings for authentication
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+	$usr = $fedora_user;
+	$password = $fedora_password;
+
+	try {
+			$client = new FedoraClient( $server, $usr, $password, $version );
+	} catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+	}
+
+	try {
+		$resp = $client->addDatastream($pid, $dsID, $args, $managedFile, $inlineXML);
+	}
+	catch (Exception $e) {
+		$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+		drupal_set_message("Exception Object:: $exception\n", 'error');
+		fedora_rest_save_messages();
+		return FALSE;
+	}
+
+  drupal_set_message(t("Add datastream response: !resp", array('!resp' => $resp)),
                          'status' );
   fedora_rest_save_messages();
   

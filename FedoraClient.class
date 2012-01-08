@@ -389,7 +389,7 @@ class FedoraClient {
 
         if (isset($managedFile)) {
             $fields = array();
-            $fields[basename($managedFile)]="@$managedFile";
+            $fields[basename($managedFile)]='@' . $managedFile;
         } elseif (isset($inlineXML)) {
             // ** NOT TESTED **
             $fields = $inlineXML;
@@ -981,12 +981,14 @@ class FedoraClient {
         if ((!isset($info['http_code'])) ||
             $info['http_code'] < 200 || $info['http_code'] > 299)
         {
+/*
 var_dump($url);
 var_dump($fields);
 var_dump($response);
 var_dump($info);
 var_dump($object);
 die;
+*/
             throw new Exception("Unsuccessful request-->$response<--",
                         ( isset($info['http_code']) )? $info['http_code'] : 0);
         }
