@@ -368,6 +368,7 @@ function fedora_rest_retrieve_objects_dc($pids) {
 			$client = new FedoraClient( $server, $usr, $password, $version );
 	} catch (Exception $e) {
 			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			watchdog(__FUNCTION__, t("Exception Object:: $exception\n"), array(), WATCHDOG_ERROR);
 			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
 			fedora_rest_save_messages();
 			return FALSE;
@@ -397,8 +398,8 @@ function fedora_rest_retrieve_objects_dc($pids) {
 		}
 		$rcount = count($response);
 		if ($rcount != 1) {
-			drupal_set_message("Search for objects with !q returned !r!\n",
-																 array('!q' => $q, '!r' => $rcount),
+			drupal_set_message(t("Search for objects with !q returned !r!\n",
+																 array('!q' => $q, '!r' => $rcount)),
 															 'error');
 			fedora_rest_save_messages();
 			return FALSE;
@@ -470,8 +471,8 @@ function fedora_rest_retrieve_objects_ds($pids, $dsId = NULL) {
 		}
 		$rcount = count($response);
 		if ($rcount != 1) {
-			drupal_set_message("Search for objects for datastream !d returned !r!\n",
-																 array('!d' => $dsId, '!r' => $rcount),
+			drupal_set_message(t("Search for objects for datastream !d returned !r!\n",
+																 array('!d' => $dsId, '!r' => $rcount)),
 															 'error');
 			fedora_rest_save_messages();
 			return FALSE;
@@ -607,6 +608,84 @@ function fedora_rest_add_datastream($pid, $dsID, $args, $managedFile, $inlineXML
 	}
 
   drupal_set_message(t("Add datastream response: !resp", array('!resp' => $resp)),
+                         'status' );
+  fedora_rest_save_messages();
+  
+  return $resp;	
+}
+
+function fedora_rest_get_datastream($pid, $dsID, $format='xml', $validateChecksum=NULL, $asOfDateTime=NULL) {
+	fedora_rest_trace("fedora_rest_get_datastream()");
+	global $_fedora_rest_import_messages;
+
+  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
+  $version = variable_get('fedora_rest_version_arg', '3.4');
+
+	// load the default settings for authentication
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+	$usr = $fedora_user;
+	$password = $fedora_password;
+
+	try {
+			$client = new FedoraClient( $server, $usr, $password, $version );
+	} catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+	}
+
+	try {
+		$resp = $client->getDatastream($pid, $dsID, $format, $validateChecksum, $asOfDateTime);
+	}
+	catch (Exception $e) {
+		$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+		drupal_set_message("Exception Object:: $exception\n", 'error');
+		fedora_rest_save_messages();
+		return FALSE;
+	}
+
+  drupal_set_message(t("Get datastream response: !resp", array('!resp' => $resp)),
+                         'status' );
+  fedora_rest_save_messages();
+  
+  return $resp;	
+}
+
+function fedora_rest_get_datastream_dissemination($pid, $dsID, $binary=FALSE, $asOfDateTime=NULL) {
+	fedora_rest_trace("fedora_rest_get_datastream_dissemination()");
+	global $_fedora_rest_import_messages;
+
+  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
+  $version = variable_get('fedora_rest_version_arg', '3.4');
+
+	// load the default settings for authentication
+	$fedora_rest_settings = "settings.php";
+	require($fedora_rest_settings);
+	$usr = $fedora_user;
+	$password = $fedora_password;
+
+	try {
+			$client = new FedoraClient( $server, $usr, $password, $version );
+	} catch (Exception $e) {
+			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
+			fedora_rest_save_messages();
+			return FALSE;
+	}
+
+	try {
+		$resp = $client->getDatastreamDissemination($pid, $dsID, $binary, $asOfDateTime);
+	}
+	catch (Exception $e) {
+		$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
+		drupal_set_message("Exception Object:: $exception\n", 'error');
+		fedora_rest_save_messages();
+		return FALSE;
+	}
+
+  drupal_set_message(t("Get datastream dissemination response: !resp", array('!resp' => $resp)),
                          'status' );
   fedora_rest_save_messages();
   

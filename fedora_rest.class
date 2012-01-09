@@ -34,27 +34,88 @@ class fedora_rest {
 				$this->auth = ($fedora_user && $fedora_password);
     }
     
-    public function retrieveObjectPids($subject, $predicate, $object) {
+    public function retrieveSubjectTerms($subject, $predicate, $object) {
+			$results = 	$this->retrieveSPO($subject, $predicate, $object);
+			
+			$subjects = array();
+			foreach($results['subjects'] as $subject) {
+				$path = preg_split('|/|', $subject);
+				$subjects[] = array_pop($path);
+			}
+
+			return $subjects;			
+    }
+
+    public function retrievePredicateTerms($subject, $predicate, $object) {
+			$results = 	$this->retrieveSPO($subject, $predicate, $object);
+			
+			$predicates = array();
+			foreach($results['predicates'] as $predicate) {
+				$path = preg_split('|/|', $predicate);
+				$predicates[] = array_pop($path);
+			}
+
+			return $predicates;			
+    }
+
+    public function retrieveObjectTerms($subject, $predicate, $object) {
+			$results = 	$this->retrieveSPO($subject, $predicate, $object);
+			
+			$objects = array();
+			foreach($results['objects'] as $object) {
+				$path = preg_split('|/|', $object);
+				$objects[] = array_pop($path);
+			}
+
+			return $objects;			
+    }
+
+		public function retrieveSPO($subject, $predicate, $object) {
     	$results = fedora_rest_retrieve_spo($subject, $predicate, $object);
 
 			/***********************************************************************
-			 * return an array of pids of the fedora objects
+			 * return an array of subjects (typically pids) of the fedora objects
 			 */
-			$pids = array();
-			foreach ($results as $pid_URI => $rdf) {
-				$path = preg_split('|/|', $pid_URI);
-				$pids[] = array_pop($path);
-			}
-		
-			return $pids;    	
-    }
+			$subjects = array();
+			$predicates = array();
+			$objects = array();
+			foreach ($results as $subject_URI => $predicate_rdf) {
+			
+				foreach ($predicate_rdf as $predicate => $object_rdf) {
+					$predicates[] = $predicate;
+					$object = array_pop($object_rdf->xpath('@rdf:resource'));
 
+						foreach($object as $attributes => $resource) {
+							$path = preg_split('|/|', (string)$resource);
+							$objects[] = array_pop($path);
+						}
+				}
+				
+				$path = preg_split('|/|', $subject_URI);
+				$subjects[] = array_pop($path);
+			}
+
+			return array('subjects' => $subjects, 'predicates' => $predicates, 'objects' => $objects);
+		}
+		
 		public function retrieveObjectsMeta($pids) {
-			return fedora_rest_retrieve_objects_dc($pids);			
+			$fos = fedora_rest_retrieve_objects_dc($pids);
+			if (!$fos) {
+				return array();
+			}
+			else {
+				return $fos;
+			}
 		}
 
 		public function retrieveObjects($pids, $dsID) {
-			return fedora_rest_retrieve_objects_ds($pids, $dsID);
+			$fos = fedora_rest_retrieve_objects_ds($pids, $dsID);
+			if (!$fos) {
+				return array();
+			}
+			else {
+				return $fos;
+			}
 		}
 		
 		public function ingest($pid, $args, $object) {
@@ -73,6 +134,16 @@ class fedora_rest {
 			fclose($handle);
 			$resp = fedora_rest_modify_datastream($pid, $dsID, $args, $tmpfname, $curlWorkaround);
 			unlink($tmpfname);
+			return $resp;
+		}
+
+		public function get_datastream($pid, $dsID, $format='xml', $validateChecksum=NULL, $asOfDateTime=NULL) {
+			$resp = fedora_rest_get_datastream($pid, $dsID, $format, $validateChecksum, $asOfDateTime);
+			return $resp;
+		}
+		
+		public function get_datastream_dissemination($pid, $dsID, $binary, $asOfDateTime) {
+			$resp = fedora_rest_get_datastream_dissemination($pid, $dsID, $binary, $asOfDateTime);
 			return $resp;
 		}
 

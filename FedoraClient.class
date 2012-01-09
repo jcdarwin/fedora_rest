@@ -148,10 +148,9 @@ class FedoraClient {
         if (isset($asOfDateTime)) {
             $query .= '?asOfDateTime=' . urlencode($asOfDateTime);
         }
-
         try {
             if ($binary) {
-                $data = $this->getRestBinary($query);
+                $data = $this->getRestBinary($query, $this->auth);
                 restore_error_handler();
                 return $data;
             }
@@ -463,7 +462,7 @@ class FedoraClient {
     /**
      * Invoke the API-M getDatastream web service
      *
-     * @return String filepath
+     * @return SimpleXMLElement object
      */
     public function getDatastream( $pid, $dsID, $format='html',
                             $validateChecksum=NULL, $asOfDateTime=NULL )
@@ -482,14 +481,14 @@ class FedoraClient {
 
         try {
             $filepath = $pid . $dsID . ".$format";
-            $this->getRestFile($query, $filepath, TRUE);
+            $sxe = $this->getRestXML($query, $this->auth);
         } catch (Exception $e) {
             restore_error_handler();
             throw $e;
         }
 
         restore_error_handler();
-        return $filepath;
+        return $sxe;
     }
 
     /**
@@ -771,14 +770,12 @@ class FedoraClient {
     {
         // make sure that any errors are handled by throwing an exception
         set_error_handler(array(&$this, 'fedoraClientErrorHandler'));
-
         $url = $this->server . $this->RISEARCH_REST;
         $fields = 'type=triples&lang=spo&format='.urlencode('RDF/XML')
                 . '&query='.urlencode($query);
         if ($limit) {
             $fields .= "&limit=$limit";
         }
-
         try {
             $result = $this->postRestXML($url, $fields, $this->auth);
         } catch (Exception $e) {
@@ -786,7 +783,6 @@ class FedoraClient {
             // re-throw it to the invoker
             throw $e;
         }
-
         // I can index this array with the unique URI because Mulgara will
         // combine all assertions about a subject into one rdf:Description
         $ns = $result->getNamespaces(false);
