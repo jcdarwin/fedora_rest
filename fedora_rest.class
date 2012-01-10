@@ -85,9 +85,11 @@ class fedora_rest {
 					$predicates[] = $predicate;
 					$object = array_pop($object_rdf->xpath('@rdf:resource'));
 
-						foreach($object as $attributes => $resource) {
-							$path = preg_split('|/|', (string)$resource);
-							$objects[] = array_pop($path);
+						if (!empty($object)) {
+							foreach($object as $attributes => $resource) {
+								$path = preg_split('|/|', (string)$resource);
+								$objects[] = array_pop($path);
+							}
 						}
 				}
 				
