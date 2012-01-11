@@ -1706,3 +1706,125 @@ dk.defxws.fedoragsearch.server.errors.ConfigException:
 	at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:289)
 	at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:414)
 WARN 2012-01-10 17:35:24,424 (UpdateListener) Updater properties were not loaded so no update listeners were created. Update messages will not be received or processed.
+INFO 2012-01-11 15:45:54,524 (UpdateListener) Initializing the Update Listener
+INFO 2012-01-11 15:45:54,584 (Config) fedoragsearch.properties={fedoragsearch.maxPageSize=50, fedoragsearch.indexNames=gsearch_solr, fedoragsearch.defaultGetRepositoryInfoRestXslt=demoGetRepositoryInfoToHtml, fedoragsearch.defaultBrowseIndexTermPageSize=20, fedoragsearch.defaultBrowseIndexRestXslt=demoBrowseIndexToHtml, fedoragsearch.defaultGfindObjectsHitPageSize=10, fedoragsearch.defaultGfindObjectsFieldMaxLength=100, fedoragsearch.defaultGfindObjectsSnippetsMax=3, fedoragsearch.defaultGfindObjectsRestXslt=demoGfindObjectsToHtml, fedoragsearch.mimeTypes=text/plain text/html application/pdf, fedoragsearch.updaterNames=BasicUpdaters, fedoragsearch.deployFile=CONFIGPATH/deploy.wsdd, fedoragsearch.soapUser=SOAPUSER, fedoragsearch.soapPass=SOAPPASS, fedoragsearch.defaultGetIndexInfoRestXslt=demoGetIndexInfoToHtml, fedoragsearch.defaultUpdateIndexRestXslt=demoUpdateIndexToHtml, fedoragsearch.soapBase=http://SOAPHOSTPORT/fedoragsearch/services, fedoragsearch.repositoryNames=gsearch_solr, fedoragsearch.defaultNoXslt=copyXml}
+INFO 2012-01-11 15:45:54,607 (Config) /config/repository/gsearch_solr/repository.properties={fgsrepository.repositoryName=DemoAtDtu, fgsrepository.trustStorePath=TRUSTSTOREPATH, fgsrepository.defaultGetRepositoryInfoResultXslt=copyXml, fgsrepository.fedoraPass=FEDORAPASS, fgsrepository.fedoraObjectDir=FEDORAOBJECTDIR, fgsrepository.fedoraUser=FEDORAUSER, fgsrepository.fedoraVersion=FEDORAVERSION, fgsrepository.trustStorePass=TRUSTSTOREPASS, fgsrepository.fedoraSoap=FEDORASOAP/fedora/services}
+INFO 2012-01-11 15:45:54,625 (Config) /config/index/gsearch_solr/index.properties={fgsindex.defaultQueryFields=dc.description dc.title, fgsindex.defaultUpdateIndexDocXslt=demoFoxmlToSolr, fgsindex.defaultGfindObjectsResultXslt=gfindObjectsToResultPage, fgsindex.defaultGetIndexInfoResultXslt=copyXml, fgsindex.operationsImpl=dk.defxws.fgssolr.OperationsImpl, fgsindex.indexName=DemoOnSolr, fgsindex.defaultUpdateIndexResultXslt=updateIndexToResultPage, fgsindex.indexBase=INDEXBASE, fgsindex.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer, fgsindex.defaultBrowseIndexResultXslt=browseIndexToResultPage, fgsindex.indexDir=INDEXDIR}
+DEBUG 2012-01-11 15:45:54,625 (Config) config created configName=config errors=
+DEBUG 2012-01-11 15:45:54,625 (Config) fedoragsearch.properties={fedoragsearch.maxPageSize=50, fedoragsearch.indexNames=gsearch_solr, fedoragsearch.defaultGetRepositoryInfoRestXslt=demoGetRepositoryInfoToHtml, fedoragsearch.defaultBrowseIndexTermPageSize=20, fedoragsearch.defaultBrowseIndexRestXslt=demoBrowseIndexToHtml, fedoragsearch.defaultGfindObjectsHitPageSize=10, fedoragsearch.defaultGfindObjectsFieldMaxLength=100, fedoragsearch.defaultGfindObjectsSnippetsMax=3, fedoragsearch.defaultGfindObjectsRestXslt=demoGfindObjectsToHtml, fedoragsearch.mimeTypes=text/plain text/html application/pdf, fedoragsearch.updaterNames=BasicUpdaters, fedoragsearch.deployFile=CONFIGPATH/deploy.wsdd, fedoragsearch.soapUser=SOAPUSER, fedoragsearch.soapPass=SOAPPASS, fedoragsearch.defaultGetIndexInfoRestXslt=demoGetIndexInfoToHtml, fedoragsearch.defaultUpdateIndexRestXslt=demoUpdateIndexToHtml, fedoragsearch.soapBase=http://SOAPHOSTPORT/fedoragsearch/services, fedoragsearch.repositoryNames=gsearch_solr, fedoragsearch.defaultNoXslt=copyXml}
+DEBUG 2012-01-11 15:45:54,637 (Config) checkStylesheet for /config/rest/copyXml.xslt
+DEBUG 2012-01-11 15:45:54,969 (Config) checkStylesheet for /config/rest/demoGfindObjectsToHtml.xslt
+DEBUG 2012-01-11 15:45:55,006 (Config) checkStylesheet for /config/rest/demoUpdateIndexToHtml.xslt
+DEBUG 2012-01-11 15:45:55,015 (Config) checkStylesheet for /config/rest/demoBrowseIndexToHtml.xslt
+DEBUG 2012-01-11 15:45:55,043 (Config) checkStylesheet for /config/rest/demoGetRepositoryInfoToHtml.xslt
+DEBUG 2012-01-11 15:45:55,048 (Config) checkStylesheet for /config/rest/demoGetIndexInfoToHtml.xslt
+DEBUG 2012-01-11 15:45:55,077 (Config) /config/repository/gsearch_solr/repository.properties={fgsrepository.repositoryName=DemoAtDtu, fgsrepository.trustStorePath=TRUSTSTOREPATH, fgsrepository.defaultGetRepositoryInfoResultXslt=copyXml, fgsrepository.fedoraPass=FEDORAPASS, fgsrepository.fedoraObjectDir=FEDORAOBJECTDIR, fgsrepository.fedoraUser=FEDORAUSER, fgsrepository.fedoraVersion=FEDORAVERSION, fgsrepository.trustStorePass=TRUSTSTOREPASS, fgsrepository.fedoraSoap=FEDORASOAP/fedora/services}
+DEBUG 2012-01-11 15:45:55,077 (Config) checkStylesheet for /config/repository/gsearch_solr/copyXml.xslt
+DEBUG 2012-01-11 15:45:55,080 (Config) /config/index/gsearch_solr/index.properties={fgsindex.defaultQueryFields=dc.description dc.title, fgsindex.defaultUpdateIndexDocXslt=demoFoxmlToSolr, fgsindex.defaultGfindObjectsResultXslt=gfindObjectsToResultPage, fgsindex.defaultGetIndexInfoResultXslt=copyXml, fgsindex.operationsImpl=dk.defxws.fgssolr.OperationsImpl, fgsindex.indexName=DemoOnSolr, fgsindex.defaultUpdateIndexResultXslt=updateIndexToResultPage, fgsindex.indexBase=INDEXBASE, fgsindex.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer, fgsindex.defaultBrowseIndexResultXslt=browseIndexToResultPage, fgsindex.indexDir=INDEXDIR}
+DEBUG 2012-01-11 15:45:55,113 (Config) checkStylesheet for /config/index/gsearch_solr/demoFoxmlToSolr.xslt
+DEBUG 2012-01-11 15:45:55,147 (Config) checkStylesheet for /config/index/gsearch_solr/updateIndexToResultPage.xslt
+DEBUG 2012-01-11 15:45:55,151 (Config) checkStylesheet for /config/index/gsearch_solr/gfindObjectsToResultPage.xslt
+DEBUG 2012-01-11 15:45:55,177 (Config) checkStylesheet for /config/index/gsearch_solr/browseIndexToResultPage.xslt
+DEBUG 2012-01-11 15:45:55,181 (Config) checkStylesheet for /config/index/gsearch_solr/copyXml.xslt
+DEBUG 2012-01-11 15:45:55,217 (Config) configCheck configName=config errors=
+*** config/updater/BasicUpdaters/updater.properties not found in classpath
+*** config/repository/gsearch_solr: fgsrepository.repositoryName must be=gsearch_solr
+*** config/index/gsearch_solr: fgsindex.indexName must be=gsearch_solr
+ERROR 2012-01-11 15:45:55,217 (UpdateListener) Config Exception encountered attempting to retrieve updater properties: 
+dk.defxws.fedoragsearch.server.errors.ConfigException: 
+*** config/updater/BasicUpdaters/updater.properties not found in classpath
+*** config/repository/gsearch_solr: fgsrepository.repositoryName must be=gsearch_solr
+*** config/index/gsearch_solr: fgsindex.indexName must be=gsearch_solr
+	at dk.defxws.fedoragsearch.server.Config.checkConfig(Config.java:650)
+	at dk.defxws.fedoragsearch.server.Config.<init>(Config.java:232)
+	at dk.defxws.fedoragsearch.server.Config.getCurrentConfig(Config.java:133)
+	at dk.defxws.fedoragsearch.server.UpdateListener.init(UpdateListener.java:64)
+	at javax.servlet.GenericServlet.init(GenericServlet.java:212)
+	at org.apache.catalina.core.StandardWrapper.loadServlet(StandardWrapper.java:1173)
+	at org.apache.catalina.core.StandardWrapper.load(StandardWrapper.java:993)
+	at org.apache.catalina.core.StandardContext.loadOnStartup(StandardContext.java:4421)
+	at org.apache.catalina.core.StandardContext.start(StandardContext.java:4734)
+	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:799)
+	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:779)
+	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:601)
+	at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:943)
+	at org.apache.catalina.startup.HostConfig.deployWARs(HostConfig.java:778)
+	at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:504)
+	at org.apache.catalina.startup.HostConfig.start(HostConfig.java:1317)
+	at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:324)
+	at org.apache.catalina.util.LifecycleSupport.fireLifecycleEvent(LifecycleSupport.java:142)
+	at org.apache.catalina.core.ContainerBase.start(ContainerBase.java:1065)
+	at org.apache.catalina.core.StandardHost.start(StandardHost.java:840)
+	at org.apache.catalina.core.ContainerBase.start(ContainerBase.java:1057)
+	at org.apache.catalina.core.StandardEngine.start(StandardEngine.java:463)
+	at org.apache.catalina.core.StandardService.start(StandardService.java:525)
+	at org.apache.catalina.core.StandardServer.start(StandardServer.java:754)
+	at org.apache.catalina.startup.Catalina.start(Catalina.java:595)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:289)
+	at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:414)
+WARN 2012-01-11 15:45:55,218 (UpdateListener) Updater properties were not loaded so no update listeners were created. Update messages will not be received or processed.
+INFO 2012-01-11 17:19:14,420 (UpdateListener) Initializing the Update Listener
+INFO 2012-01-11 17:19:14,481 (Config) fedoragsearch.properties={fedoragsearch.maxPageSize=50, fedoragsearch.indexNames=gsearch_solr, fedoragsearch.defaultGetRepositoryInfoRestXslt=demoGetRepositoryInfoToHtml, fedoragsearch.defaultBrowseIndexTermPageSize=20, fedoragsearch.defaultBrowseIndexRestXslt=demoBrowseIndexToHtml, fedoragsearch.defaultGfindObjectsHitPageSize=10, fedoragsearch.defaultGfindObjectsFieldMaxLength=100, fedoragsearch.defaultGfindObjectsSnippetsMax=3, fedoragsearch.defaultGfindObjectsRestXslt=demoGfindObjectsToHtml, fedoragsearch.mimeTypes=text/plain text/html application/pdf, fedoragsearch.updaterNames=BasicUpdaters, fedoragsearch.deployFile=CONFIGPATH/deploy.wsdd, fedoragsearch.soapUser=SOAPUSER, fedoragsearch.soapPass=SOAPPASS, fedoragsearch.defaultGetIndexInfoRestXslt=demoGetIndexInfoToHtml, fedoragsearch.defaultUpdateIndexRestXslt=demoUpdateIndexToHtml, fedoragsearch.soapBase=http://SOAPHOSTPORT/fedoragsearch/services, fedoragsearch.repositoryNames=gsearch_solr, fedoragsearch.defaultNoXslt=copyXml}
+INFO 2012-01-11 17:19:14,504 (Config) /config/repository/gsearch_solr/repository.properties={fgsrepository.repositoryName=DemoAtDtu, fgsrepository.trustStorePath=TRUSTSTOREPATH, fgsrepository.defaultGetRepositoryInfoResultXslt=copyXml, fgsrepository.fedoraPass=FEDORAPASS, fgsrepository.fedoraObjectDir=FEDORAOBJECTDIR, fgsrepository.fedoraUser=FEDORAUSER, fgsrepository.fedoraVersion=FEDORAVERSION, fgsrepository.trustStorePass=TRUSTSTOREPASS, fgsrepository.fedoraSoap=FEDORASOAP/fedora/services}
+INFO 2012-01-11 17:19:14,521 (Config) /config/index/gsearch_solr/index.properties={fgsindex.defaultQueryFields=dc.description dc.title, fgsindex.defaultUpdateIndexDocXslt=demoFoxmlToSolr, fgsindex.defaultGfindObjectsResultXslt=gfindObjectsToResultPage, fgsindex.defaultGetIndexInfoResultXslt=copyXml, fgsindex.operationsImpl=dk.defxws.fgssolr.OperationsImpl, fgsindex.indexName=DemoOnSolr, fgsindex.defaultUpdateIndexResultXslt=updateIndexToResultPage, fgsindex.indexBase=INDEXBASE, fgsindex.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer, fgsindex.defaultBrowseIndexResultXslt=browseIndexToResultPage, fgsindex.indexDir=INDEXDIR}
+DEBUG 2012-01-11 17:19:14,533 (Config) config created configName=config errors=
+DEBUG 2012-01-11 17:19:14,533 (Config) fedoragsearch.properties={fedoragsearch.maxPageSize=50, fedoragsearch.indexNames=gsearch_solr, fedoragsearch.defaultGetRepositoryInfoRestXslt=demoGetRepositoryInfoToHtml, fedoragsearch.defaultBrowseIndexTermPageSize=20, fedoragsearch.defaultBrowseIndexRestXslt=demoBrowseIndexToHtml, fedoragsearch.defaultGfindObjectsHitPageSize=10, fedoragsearch.defaultGfindObjectsFieldMaxLength=100, fedoragsearch.defaultGfindObjectsSnippetsMax=3, fedoragsearch.defaultGfindObjectsRestXslt=demoGfindObjectsToHtml, fedoragsearch.mimeTypes=text/plain text/html application/pdf, fedoragsearch.updaterNames=BasicUpdaters, fedoragsearch.deployFile=CONFIGPATH/deploy.wsdd, fedoragsearch.soapUser=SOAPUSER, fedoragsearch.soapPass=SOAPPASS, fedoragsearch.defaultGetIndexInfoRestXslt=demoGetIndexInfoToHtml, fedoragsearch.defaultUpdateIndexRestXslt=demoUpdateIndexToHtml, fedoragsearch.soapBase=http://SOAPHOSTPORT/fedoragsearch/services, fedoragsearch.repositoryNames=gsearch_solr, fedoragsearch.defaultNoXslt=copyXml}
+DEBUG 2012-01-11 17:19:14,534 (Config) checkStylesheet for /config/rest/copyXml.xslt
+DEBUG 2012-01-11 17:19:14,877 (Config) checkStylesheet for /config/rest/demoGfindObjectsToHtml.xslt
+DEBUG 2012-01-11 17:19:14,914 (Config) checkStylesheet for /config/rest/demoUpdateIndexToHtml.xslt
+DEBUG 2012-01-11 17:19:14,923 (Config) checkStylesheet for /config/rest/demoBrowseIndexToHtml.xslt
+DEBUG 2012-01-11 17:19:14,951 (Config) checkStylesheet for /config/rest/demoGetRepositoryInfoToHtml.xslt
+DEBUG 2012-01-11 17:19:14,956 (Config) checkStylesheet for /config/rest/demoGetIndexInfoToHtml.xslt
+DEBUG 2012-01-11 17:19:14,985 (Config) /config/repository/gsearch_solr/repository.properties={fgsrepository.repositoryName=DemoAtDtu, fgsrepository.trustStorePath=TRUSTSTOREPATH, fgsrepository.defaultGetRepositoryInfoResultXslt=copyXml, fgsrepository.fedoraPass=FEDORAPASS, fgsrepository.fedoraObjectDir=FEDORAOBJECTDIR, fgsrepository.fedoraUser=FEDORAUSER, fgsrepository.fedoraVersion=FEDORAVERSION, fgsrepository.trustStorePass=TRUSTSTOREPASS, fgsrepository.fedoraSoap=FEDORASOAP/fedora/services}
+DEBUG 2012-01-11 17:19:14,985 (Config) checkStylesheet for /config/repository/gsearch_solr/copyXml.xslt
+DEBUG 2012-01-11 17:19:14,988 (Config) /config/index/gsearch_solr/index.properties={fgsindex.defaultQueryFields=dc.description dc.title, fgsindex.defaultUpdateIndexDocXslt=demoFoxmlToSolr, fgsindex.defaultGfindObjectsResultXslt=gfindObjectsToResultPage, fgsindex.defaultGetIndexInfoResultXslt=copyXml, fgsindex.operationsImpl=dk.defxws.fgssolr.OperationsImpl, fgsindex.indexName=DemoOnSolr, fgsindex.defaultUpdateIndexResultXslt=updateIndexToResultPage, fgsindex.indexBase=INDEXBASE, fgsindex.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer, fgsindex.defaultBrowseIndexResultXslt=browseIndexToResultPage, fgsindex.indexDir=INDEXDIR}
+DEBUG 2012-01-11 17:19:15,021 (Config) checkStylesheet for /config/index/gsearch_solr/demoFoxmlToSolr.xslt
+DEBUG 2012-01-11 17:19:15,056 (Config) checkStylesheet for /config/index/gsearch_solr/updateIndexToResultPage.xslt
+DEBUG 2012-01-11 17:19:15,060 (Config) checkStylesheet for /config/index/gsearch_solr/gfindObjectsToResultPage.xslt
+DEBUG 2012-01-11 17:19:15,074 (Config) checkStylesheet for /config/index/gsearch_solr/browseIndexToResultPage.xslt
+DEBUG 2012-01-11 17:19:15,078 (Config) checkStylesheet for /config/index/gsearch_solr/copyXml.xslt
+DEBUG 2012-01-11 17:19:15,114 (Config) configCheck configName=config errors=
+*** config/updater/BasicUpdaters/updater.properties not found in classpath
+*** config/repository/gsearch_solr: fgsrepository.repositoryName must be=gsearch_solr
+*** config/index/gsearch_solr: fgsindex.indexName must be=gsearch_solr
+ERROR 2012-01-11 17:19:15,115 (UpdateListener) Config Exception encountered attempting to retrieve updater properties: 
+dk.defxws.fedoragsearch.server.errors.ConfigException: 
+*** config/updater/BasicUpdaters/updater.properties not found in classpath
+*** config/repository/gsearch_solr: fgsrepository.repositoryName must be=gsearch_solr
+*** config/index/gsearch_solr: fgsindex.indexName must be=gsearch_solr
+	at dk.defxws.fedoragsearch.server.Config.checkConfig(Config.java:650)
+	at dk.defxws.fedoragsearch.server.Config.<init>(Config.java:232)
+	at dk.defxws.fedoragsearch.server.Config.getCurrentConfig(Config.java:133)
+	at dk.defxws.fedoragsearch.server.UpdateListener.init(UpdateListener.java:64)
+	at javax.servlet.GenericServlet.init(GenericServlet.java:212)
+	at org.apache.catalina.core.StandardWrapper.loadServlet(StandardWrapper.java:1173)
+	at org.apache.catalina.core.StandardWrapper.load(StandardWrapper.java:993)
+	at org.apache.catalina.core.StandardContext.loadOnStartup(StandardContext.java:4421)
+	at org.apache.catalina.core.StandardContext.start(StandardContext.java:4734)
+	at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:799)
+	at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:779)
+	at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:601)
+	at org.apache.catalina.startup.HostConfig.deployWAR(HostConfig.java:943)
+	at org.apache.catalina.startup.HostConfig.deployWARs(HostConfig.java:778)
+	at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:504)
+	at org.apache.catalina.startup.HostConfig.start(HostConfig.java:1317)
+	at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:324)
+	at org.apache.catalina.util.LifecycleSupport.fireLifecycleEvent(LifecycleSupport.java:142)
+	at org.apache.catalina.core.ContainerBase.start(ContainerBase.java:1065)
+	at org.apache.catalina.core.StandardHost.start(StandardHost.java:840)
+	at org.apache.catalina.core.ContainerBase.start(ContainerBase.java:1057)
+	at org.apache.catalina.core.StandardEngine.start(StandardEngine.java:463)
+	at org.apache.catalina.core.StandardService.start(StandardService.java:525)
+	at org.apache.catalina.core.StandardServer.start(StandardServer.java:754)
+	at org.apache.catalina.startup.Catalina.start(Catalina.java:595)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:597)
+	at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:289)
+	at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:414)
+WARN 2012-01-11 17:19:15,115 (UpdateListener) Updater properties were not loaded so no update listeners were created. Update messages will not be received or processed.

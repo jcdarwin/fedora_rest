@@ -4,158 +4,217 @@
 /**
  * @file
  *
- * Expose methods from the fedora_rest modules for other modules
+ * Expose methods from the fedora_rest modules for other modules.
+ *
+ * This class is simply a wrapper of the FedoraClient class to allow other modules to:
+ * * access methods without having to be worried about some of the finer points of communication
+ *   with Fedora (for example, authentication, the name of the server etc).
  */
 
 class fedora_rest {
 
-    // Fedora server connection parameters (set in constructor)
-    protected $server=NULL;
-    protected $usernm=NULL;
-    protected $userpw=NULL;
-    protected $version=NULL;
-    protected $auth=NULL;
+	// Fedora server connection parameters (set in constructor)
+	protected $server=NULL;
+	protected $usernm=NULL;
+	protected $userpw=NULL;
+	protected $version=NULL;
+	protected $auth=NULL;
 
-    /**
-     * Class constructor :: set up parameters to connect to repository
-     *
-     */
-    public function __construct()
-    {
-				// Pull in the required settings and methods from this module for exposure.
-				require('settings.php');
-				require_once('fedora_rest_admin.inc');
-				
-        // initialize class variables
-        $this->server = $fedora_server;
-        $this->usernm = $fedora_user;
-        $this->userpw = $fedora_password;
-        $this->version = $fedora_version;
-				$this->auth = ($fedora_user && $fedora_password);
-    }
-    
-    public function retrieveSubjectTerms($subject, $predicate, $object) {
-			$results = 	$this->retrieveSPO($subject, $predicate, $object);
-			
-			$subjects = array();
-			foreach($results['subjects'] as $subject) {
-				$path = preg_split('|/|', $subject);
-				$subjects[] = array_pop($path);
-			}
+	/**
+	 * Class constructor :: set up parameters to connect to repository
+	 *
+	 */
+	public function __construct() {
+		// Pull in the required settings and methods from this module for exposure.
+		require('settings.php');
+		require_once('fedora_rest_admin.inc');
+		
+		// initialize class variables
+		$this->server = $fedora_server;
+		$this->usernm = $fedora_user;
+		$this->userpw = $fedora_password;
+		$this->version = $fedora_version;
+		$this->auth = ($fedora_user && $fedora_password);
+	}
+	
+	/**
+	 * Retrieve the subject terms (less any namespace) from the triplestore
+	 * where there is a match to the supplied subject, predicate, object pattern.
+	 *
+	 * @return array (possibly empty) of SimpleXMLElement objects.
+	 */
+	public function retrieveSubjectTerms($subject, $predicate, $object) {
+		$results = 	$this->retrieveSPO($subject, $predicate, $object);
+		
+		$subjects = array();
+		foreach($results['subjects'] as $subject) {
+			$path = preg_split('|/|', $subject);
+			$subjects[] = array_pop($path);
+		}
 
-			return $subjects;			
-    }
+		return $subjects;			
+	}
 
-    public function retrievePredicateTerms($subject, $predicate, $object) {
-			$results = 	$this->retrieveSPO($subject, $predicate, $object);
-			
-			$predicates = array();
-			foreach($results['predicates'] as $predicate) {
-				$path = preg_split('|/|', $predicate);
-				$predicates[] = array_pop($path);
-			}
+	/**
+	 * Retrieve the predicate terms (less any namespace) from the triplestore
+	 * where there is a match to the supplied subject, predicate, object pattern.
+	 *
+	 * @return array (possibly empty) of SimpleXMLElement objects.
+	 */
+	public function retrievePredicateTerms($subject, $predicate, $object) {
+		$results = 	$this->retrieveSPO($subject, $predicate, $object);
+		
+		$predicates = array();
+		foreach($results['predicates'] as $predicate) {
+			$path = preg_split('|/|', $predicate);
+			$predicates[] = array_pop($path);
+		}
 
-			return $predicates;			
-    }
+		return $predicates;			
+	}
 
-    public function retrieveObjectTerms($subject, $predicate, $object) {
-			$results = 	$this->retrieveSPO($subject, $predicate, $object);
-			
-			$objects = array();
-			foreach($results['objects'] as $object) {
-				$path = preg_split('|/|', $object);
-				$objects[] = array_pop($path);
-			}
+	/**
+	 * Retrieve the object terms (less any namespace) from the triplestore
+	 * where there is a match to the supplied subject, predicate, object pattern.
+	 *
+	 * @return array (possibly empty) of SimpleXMLElement objects.
+	 */
+	public function retrieveObjectTerms($subject, $predicate, $object) {
+		$results = 	$this->retrieveSPO($subject, $predicate, $object);
+		
+		$objects = array();
+		foreach($results['objects'] as $object) {
+			$path = preg_split('|/|', $object);
+			$objects[] = array_pop($path);
+		}
 
-			return $objects;			
-    }
+		return $objects;			
+	}
 
-		public function retrieveSPO($subject, $predicate, $object) {
-    	$results = fedora_rest_retrieve_spo($subject, $predicate, $object);
+	/**
+	 * Retrieve the predicate terms (less any namespace) from the triplestore
+	 * where there is a match to the supplied subject, predicate, object pattern.
+	 *
+	 * @return array (possibly empty) of SimpleXMLElement objects.
+	 */
+	public function retrieveSPO($subject, $predicate, $object) {
+		$results = fedora_rest_retrieve_spo($subject, $predicate, $object);
+		$subjects = array();
+		$predicates = array();
+		$objects = array();
+		foreach ($results as $subject_URI => $predicate_rdf) {
+		
+			foreach ($predicate_rdf as $predicate => $object_rdf) {
+				$predicates[] = $predicate;
+				$object = array_pop($object_rdf->xpath('@rdf:resource'));
 
-			/***********************************************************************
-			 * return an array of subjects (typically pids) of the fedora objects
-			 */
-			$subjects = array();
-			$predicates = array();
-			$objects = array();
-			foreach ($results as $subject_URI => $predicate_rdf) {
-			
-				foreach ($predicate_rdf as $predicate => $object_rdf) {
-					$predicates[] = $predicate;
-					$object = array_pop($object_rdf->xpath('@rdf:resource'));
-
-						if (!empty($object)) {
-							foreach($object as $attributes => $resource) {
-								$path = preg_split('|/|', (string)$resource);
-								$objects[] = array_pop($path);
-							}
+					if (!empty($object)) {
+						foreach($object as $attributes => $resource) {
+							$path = preg_split('|/|', (string)$resource);
+							$objects[] = array_pop($path);
 						}
-				}
-				
-				$path = preg_split('|/|', $subject_URI);
-				$subjects[] = array_pop($path);
+					}
 			}
-
-			return array('subjects' => $subjects, 'predicates' => $predicates, 'objects' => $objects);
-		}
-		
-		public function retrieveObjectsMeta($pids) {
-			$fos = fedora_rest_retrieve_objects_dc($pids);
-			if (!$fos) {
-				return array();
-			}
-			else {
-				return $fos;
-			}
+			
+			$path = preg_split('|/|', $subject_URI);
+			$subjects[] = array_pop($path);
 		}
 
-		public function retrieveObjects($pids, $dsID) {
-			$fos = fedora_rest_retrieve_objects_ds($pids, $dsID);
-			if (!$fos) {
-				return array();
-			}
-			else {
-				return $fos;
-			}
+		return array('subjects' => $subjects, 'predicates' => $predicates, 'objects' => $objects);
+	}
+	
+	/**
+	 * Retrieve basic object metadata from the DC stream.
+	 *
+	 * @return array (possibly empty) of SimpleXMLElement objects.
+	 */
+	public function retrieveObjectsMeta($pids) {
+		$fos = fedora_rest_retrieve_objects_dc($pids);
+		if (!$fos) {
+			return array();
 		}
-		
-		public function ingest($pid, $args, $object) {
-			return fedora_rest_ingest($pid, $args, $object);
+		else {
+			return $fos;
 		}
-		
-		public function add_datastream($pid, $dsID, $args, $managedFileUri, $inlineXML) {
-			$resp = fedora_rest_add_datastream($pid, $dsID, $args, drupal_realpath($managedFileUri), $inlineXML);
-			return $resp;
-		}
-		
-		public function modify_datastream($pid, $dsID, $args, $modifiedFile, $curlWorkaround) {
-			$tmpfname = tempnam('/tmp', $dsID);
-			$handle = fopen($tmpfname, 'w');
-			fwrite($handle, $modifiedFile);
-			fclose($handle);
-			$resp = fedora_rest_modify_datastream($pid, $dsID, $args, $tmpfname, $curlWorkaround);
-			unlink($tmpfname);
-			return $resp;
-		}
+	}
 
-		public function get_datastream($pid, $dsID, $format='xml', $validateChecksum=NULL, $asOfDateTime=NULL) {
-			$resp = fedora_rest_get_datastream($pid, $dsID, $format, $validateChecksum, $asOfDateTime);
-			return $resp;
+	/**
+	 * Retrieve objects for the supplied combination of PID and datastream id.
+	 *
+	 * @return array (possibly empty) of SimpleXMLElement objects.
+	 */
+	public function retrieveObjects($pids, $dsID) {
+		$fos = fedora_rest_retrieve_objects_ds($pids, $dsID);
+		if (!$fos) {
+			return array();
 		}
-		
-		public function get_datastream_dissemination($pid, $dsID, $binary, $asOfDateTime) {
-			$resp = fedora_rest_get_datastream_dissemination($pid, $dsID, $binary, $asOfDateTime);
-			return $resp;
+		else {
+			return $fos;
 		}
+	}
+	
+	/**
+	 * Ingest the supplied object into Fedora.
+	 *
+	 * @return response as returned by the Fedora REST call.
+	 */
+	public function ingest($pid, $args, $object) {
+		return fedora_rest_ingest($pid, $args, $object);
+	}
+	
+	/**
+	 * Add the supplied data to a datastream on the object given by the supplied PID.
+	 *
+	 * @return response as returned by the Fedora REST call.
+	 */
+	public function addDatastream($pid, $dsID, $args, $managedFileUri, $inlineXML) {
+		$resp = fedora_rest_add_datastream($pid, $dsID, $args, drupal_realpath($managedFileUri), $inlineXML);
+		return $resp;
+	}
+	
+	/**
+	 * Modifiy the nominated datastream on the object given by the supplied PID with the supplied data.
+	 *
+	 * @return response as returned by the Fedora REST call.
+	 */
+	public function modifyDatastream($pid, $dsID, $args, $modifiedFile, $curlWorkaround) {
+		$tmpfname = tempnam('/tmp', $dsID);
+		$handle = fopen($tmpfname, 'w');
+		fwrite($handle, $modifiedFile);
+		fclose($handle);
+		$resp = fedora_rest_modify_datastream($pid, $dsID, $args, $tmpfname, $curlWorkaround);
+		unlink($tmpfname);
+		return $resp;
+	}
 
-		public function purgeObject($pid, $args) {
-			return fedora_rest_purge_object($pid, $args);
-		}
+	/**
+	 * Retrieve the nominated datastream metadata for the object as given by the supplied PID.
+	 *
+	 * @return response in the format supplied (typicaly XML).
+	 */
+	public function getDatastream($pid, $dsID, $format='xml', $validateChecksum=NULL, $asOfDateTime=NULL) {
+		$resp = fedora_rest_get_datastream($pid, $dsID, $format, $validateChecksum, $asOfDateTime);
+		return $resp;
+	}
+	
+	/**
+	 * Retrieve the nominated datastream contents for the object as given by the supplied PID.
+	 *
+	 * @return response as per the datastream content (may be binary).
+	 */
+	public function getDatastreamDissemination($pid, $dsID, $binary, $asOfDateTime) {
+		$resp = fedora_rest_get_datastream_dissemination($pid, $dsID, $binary, $asOfDateTime);
+		return $resp;
+	}
 
-		public function form_datastream_url($pid, $dsID) {
-			return $this->server . "/objects/$pid/datastreams/$dsID/content";
-		}
-		
+	/**
+	 * Purge the object as given by the supplied PID.
+	 *
+	 * @return response as returned by the Fedora REST call.
+	 */
+	public function purgeObject($pid, $args) {
+		return fedora_rest_purge_object($pid, $args);
+	}
+
 }
 

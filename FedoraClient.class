@@ -679,8 +679,6 @@ class FedoraClient {
      */
     public function purgeObject($pid, $args=array())
     {
-        // ** NOT TESTED **
-
         // make sure that any errors are handled by throwing an exception
         set_error_handler(array(&$this, 'fedoraClientErrorHandler'));
 
@@ -977,14 +975,6 @@ class FedoraClient {
         if ((!isset($info['http_code'])) ||
             $info['http_code'] < 200 || $info['http_code'] > 299)
         {
-/*
-var_dump($url);
-var_dump($fields);
-var_dump($response);
-var_dump($info);
-var_dump($object);
-die;
-*/
             throw new Exception("Unsuccessful request-->$response<--",
                         ( isset($info['http_code']) )? $info['http_code'] : 0);
         }
@@ -1087,8 +1077,6 @@ die;
      */
     protected function putRestFile($url, $filepath, $auth=FALSE)
     {
-        // Note: this gets a 401 (Unauthorized?) error when I tested it
-        //      with the DHO repository
         $put = curl_init($url);
         curl_setopt($put, CURLOPT_HEADER, 0); 
         curl_setopt($put, CURLOPT_RETURNTRANSFER, 1); 

@@ -228,7 +228,6 @@ function fedora_rest_admin_config_submit($form, &$form_state) {
     }
   }
 
-  // $format = $form_state['values']['format'];
   $format = 0;
   variable_set('fedora_rest_format', $format);
 
@@ -294,9 +293,8 @@ function fedora_rest_admin_config_submit($form, &$form_state) {
   }
 }
 
-// * <http://quakestudies.canterbury.ac.nz#hasType> <info:fedora/qsr:content_partner>
-function fedora_rest_retrieve_spo($spo_subject, $spo_predicate, $spo_object ) {
-	fedora_rest_trace("fedora_rest_retrieve_spo($spo_subject,$spo_predicate,$spo_object)");
+function fedora_rest_get_client() {
+	fedora_rest_trace("fedora_rest_get_client()");
 	global $_fedora_rest_import_messages;
 
   $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
@@ -317,6 +315,18 @@ function fedora_rest_retrieve_spo($spo_subject, $spo_predicate, $spo_object ) {
 			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
 			fedora_rest_save_messages();
 			return FALSE;
+	}
+
+	return $client;
+}
+
+function fedora_rest_retrieve_spo($spo_subject, $spo_predicate, $spo_object, $res_limit=1000) {
+	fedora_rest_trace("fedora_rest_retrieve_spo($spo_subject,$spo_predicate,$spo_object)");
+	global $_fedora_rest_import_messages;
+
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
 
   /***********************************************************************
@@ -355,25 +365,11 @@ function fedora_rest_retrieve_objects_dc($pids) {
 	fedora_rest_trace("fedora_rest_retrieve_objects_dc($pids)");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			watchdog(__FUNCTION__, t("Exception Object:: $exception\n"), array(), WATCHDOG_ERROR);
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
-	
+
   /***********************************************************************
    * return an array of the fedora objects
    */
@@ -435,24 +431,11 @@ function fedora_rest_retrieve_objects_ds($pids, $dsId = NULL) {
 	fedora_rest_trace("fedora_rest_retrieve_objects_ds($pids, $dsId)");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
-	
+
   /***********************************************************************
    * return an array of the fedora objects
    */
@@ -500,22 +483,9 @@ function fedora_rest_get_next_pid() {
 	fedora_rest_trace("fedora_rest_get_next_pid()");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
 
 	try {
@@ -540,22 +510,9 @@ function fedora_rest_ingest($pid, $args, $object) {
 	fedora_rest_trace("fedora_rest_ingest()");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
 
 	try {
@@ -579,22 +536,9 @@ function fedora_rest_add_datastream($pid, $dsID, $args, $managedFile, $inlineXML
 	fedora_rest_trace("fedora_rest_add_datastream()");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
 
 	try {
@@ -618,22 +562,9 @@ function fedora_rest_get_datastream($pid, $dsID, $format='xml', $validateChecksu
 	fedora_rest_trace("fedora_rest_get_datastream()");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
 
 	try {
@@ -657,22 +588,9 @@ function fedora_rest_get_datastream_dissemination($pid, $dsID, $binary=FALSE, $a
 	fedora_rest_trace("fedora_rest_get_datastream_dissemination()");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
 
 	try {
@@ -684,8 +602,8 @@ function fedora_rest_get_datastream_dissemination($pid, $dsID, $binary=FALSE, $a
 		fedora_rest_save_messages();
 		return FALSE;
 	}
-
-  drupal_set_message(t("Get datastream dissemination response: !resp", array('!resp' => $resp)),
+	
+	drupal_set_message(t("Get datastream dissemination response: !resp", array('!resp' => $resp)),
                          'status' );
   fedora_rest_save_messages();
   
@@ -696,22 +614,9 @@ function fedora_rest_modify_datastream($pid, $dsID, $args, $modifiedFile, $curlW
 	fedora_rest_trace("fedora_rest_modify_datastream()");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
 
 	try {
@@ -736,22 +641,9 @@ function fedora_rest_purge_object($pid, $args) {
 	fedora_rest_trace("fedora_rest_purge_object()");
 	global $_fedora_rest_import_messages;
 
-  $server = variable_get('fedora_rest_server_arg', 'http://localhost:8080/fedora');
-  $version = variable_get('fedora_rest_version_arg', '3.4');
-
-	// load the default settings for authentication
-	$fedora_rest_settings = "settings.php";
-	require($fedora_rest_settings);
-	$usr = $fedora_user;
-	$password = $fedora_password;
-
-	try {
-			$client = new FedoraClient( $server, $usr, $password, $version );
-	} catch (Exception $e) {
-			$exception = '<pre>' . print_r($e, TRUE) . '</pre>';
-			drupal_set_message(t("Exception Object:: $exception\n"), 'error');
-			fedora_rest_save_messages();
-			return FALSE;
+	$client = fedora_rest_get_client();
+	if (!$client) {
+		return FALSE;
 	}
 
 	try {
